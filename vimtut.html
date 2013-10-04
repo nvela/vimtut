@@ -1,0 +1,131 @@
+<html>
+  <head>
+    <style>
+      body {
+        font-size: 24px;
+        font-family: 'Share Tech Mono', sans-serif;
+      }
+
+      #grid {
+        border: 3px solid black;
+      }
+
+      .cell {
+        border-left: 1px dotted lightGray;
+        border-right: 1px dotted lightGray;
+      }
+
+      .cursor {
+        background-color: lightGray;
+      }
+    </style>
+
+    <link href='http://fonts.googleapis.com/css?family=Share+Tech+Mono' rel='stylesheet' type='text/css'>
+
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script>
+      var curPos = 0;
+      var text = "Sample sentence that I want to be able to traverse with vim commands.";
+      var KEY_CODES = {
+        'L': 72,
+        'R': 76,
+        '4': 52, // $
+        '6': 54, // ^
+      };
+
+      $(function() {
+        generateBlankRows();
+        generateSentenceRow();
+        drawCursor(curPos);
+        initKeyEvents();
+      });
+
+      function generateBlankRows() {
+        for (var i = 0; i < 10; i++) {
+          var rowName = 'row-' + i;
+          var div = $('<div id="' + rowName + '"></div>');
+          for (var j = 0; j < text.length; j++) {
+            var cellName = 'cell-' + j;
+            var span = $('<span></span>').addClass(cellName).addClass('cell').html('&nbsp;');
+            div.append(span);
+          }
+          $('#grid').append(div);
+        }
+      }
+
+      function generateSentenceRow() {
+        var sentenceDiv = $('<div id="sentence"></div>');
+        //sentenceDiv.text(text);
+        var chars = text.split('');
+        chars.forEach(function(char, index) {
+          var cellName = 'cell-' + index;
+          var span = $('<span></span>').addClass(cellName).addClass('cell').text(char);
+          sentenceDiv.append(span);
+        });
+        $('#grid').append(sentenceDiv);
+      }
+
+      function drawCursor(pos) {
+        $('#sentence .cell').removeClass('cursor');
+        $('#sentence .cell-' + pos).addClass('cursor');
+      }
+
+      function initKeyEvents() {
+        $('body').keydown(function(event) {
+          //console.log(event.which);
+          switch(event.which) {
+            case KEY_CODES['L']:
+              moveCursorLeft();
+              break;
+            case KEY_CODES['R']:
+              moveCursorRight();
+              break;
+            case KEY_CODES['4']:
+              if (event.shiftKey) {
+                moveCursorToEndOfLine();
+              }
+              break;
+            case KEY_CODES['6']:
+              if (event.shiftKey) {
+                moveCursorToStartOfLine();
+              }
+          }
+        });
+      }
+
+      function moveCursorLeft() {
+        if (curPos > 0) {
+          curPos--;                
+        }
+        drawCursor(curPos);
+      }
+
+      function moveCursorRight() {
+        if (curPos < text.length - 1) {
+          curPos++;
+        }
+        drawCursor(curPos);
+      }
+
+      function moveCursorToEndOfLine() {
+        curPos = text.length - 1;
+        drawCursor(curPos);
+      }
+
+      function moveCursorToStartOfLine() {
+        curPos = 0;
+        drawCursor(curPos);
+      }
+    </script>
+
+  </head>
+
+  <body>
+    <div id="grid"></div>
+
+
+<!--     <span style="background-color:lightGray">S</span>
+ -->
+  </body>
+
+</html>
